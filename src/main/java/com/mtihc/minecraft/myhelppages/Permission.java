@@ -2,7 +2,7 @@ package com.mtihc.minecraft.myhelppages;
 
 /**
  * This enum contains permission nodes that are used by the command executor.
- * 
+ *
  * @author Mitch
  *
  */
@@ -17,7 +17,7 @@ public enum Permission {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Enum#toString()
      */
     @Override
@@ -27,7 +27,7 @@ public enum Permission {
 
     /**
      * Input a page name and this method returns the required permission node.
-     * 
+     *
      * @param name
      *            The page name
      * @return The permission node

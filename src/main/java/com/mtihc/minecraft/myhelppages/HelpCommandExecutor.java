@@ -2,7 +2,6 @@ package com.mtihc.minecraft.myhelppages;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -12,110 +11,78 @@ import org.bukkit.command.CommandSender;
 
 /**
  * This class can execute the commands of the plugin.
- * 
+ *
  * <p>
  * It can be used as a paremeter in the <code>setExecutor()</code> method
  * of a <code>PluginCommand</code>.
  * </p>
- * 
+ *
  * <p>
  * For example:
- * 
+ *
  * <pre>
  * plugin.getCommand(label).setExecutor(executor);
  * </pre>
  * </p>
- * 
+ *
  * @author Mitch
  *
  */
 public class HelpCommandExecutor implements CommandExecutor {
-
+    private IHelpPagesConfiguration pages;
     private IHelpConfiguration config;
 
     /**
      * Constructor.
-     * 
+     *
      * @param config
      *            The configuration for this executor
      */
-    public HelpCommandExecutor(IHelpConfiguration config) {
+    public HelpCommandExecutor(IHelpConfiguration config, IHelpPagesConfiguration pages) {
         this.config = config;
+        this.pages = pages;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String lbl = label.toLowerCase();
-
-        // label must be help
-        if (lbl.equalsIgnoreCase("help")) {
-            String nested;
-
-            // get first argument (could be one of the commands)
-            try {
-                nested = args[0];
-            } catch (Exception e) {
-                // there are no arguments, so
-                // executed the main command
-                help(sender, args);
-                return true;
-            }
-
-            // remove first argument (which is a command label)
-            String[] newArgs;
-            try {
-                newArgs = Arrays.copyOfRange(args, 1, args.length);
-            } catch (Exception e) {
-                newArgs = new String[0];
-            }
-
-            //
-            // Find and execute nested command.
-            // Use the newArgs, so that it doesn't include
-            // the label of the nested command.
-            //
-            if (nested.equalsIgnoreCase("-list")) {
-                list(sender, newArgs);
-            } else if (nested.equalsIgnoreCase("-reload")) {
-                reload(sender, newArgs);
-            } else if (nested.equals("?")) {
-                commandHelp(sender, newArgs);
-            } else {
-                // didn't execute a nested command
-
-                // So don't use newArgs here.
-                // The first argument is probably a page name!
-                help(sender, args);
-            }
+        if (args.length == 0) {
+            this.help(sender, args);
             return true;
-
-        } else {
-            // we don't know this command label
-            return false;
         }
+        String nested = args[0].toLowerCase();
+        if (nested.equals("-list")) {
+            this.list(sender, Arrays.copyOfRange(args, 1, args.length));
+            return true;
+        }
+        if (nested.equals("-reload")) {
+            this.reload(sender);
+            return true;
+        }
+        if (nested.equals("?") || nested.equals("help") || nested.equals("-help")) {
+            this.commandHelp(sender);
+            return true;
+        }
+        this.help(sender, args);
+        return true;
     }
 
     /**
      * Send command help
-     * 
+     *
      * @param sender
      *            The command sender
-     * @param args
-     *            The commnd arguments
      */
-    public void commandHelp(CommandSender sender, String[] args) {
+    public void commandHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.GREEN + "Command list:");
-
         sender.sendMessage(ChatColor.WHITE + "/help" + ChatColor.DARK_GREEN + " See the main help page.");
         sender.sendMessage(ChatColor.WHITE + "/help [page name]" + ChatColor.DARK_GREEN + " See a help page.");
         sender.sendMessage(ChatColor.WHITE + "/help -list [number]" + ChatColor.DARK_GREEN + " List all help pages.");
-        sender.sendMessage(ChatColor.WHITE + "/help -reload" + ChatColor.DARK_GREEN + " Reload the configuration.");
-
+        sender.sendMessage(ChatColor.WHITE + "/help -reload" + ChatColor.DARK_GREEN + " Reload the configuration and pages.");
     }
 
     /**
      * The help command. Shows a help page to the command sender.
-     * 
+     *
      * @param sender
      *            The command sender
      * @param args
@@ -130,8 +97,7 @@ public class HelpCommandExecutor implements CommandExecutor {
         String userFriendlyName = name.replace("-", " ");
 
         // check existance
-        if (!config.hasPage(name)) {
-            // send configured error message
+        if (!pages.hasPage(name)) {
             String msg = config.getMessagePageNotFound();
             msg = convertColors(msg);
             msg = msg.replace("%page%", userFriendlyName);
@@ -144,15 +110,12 @@ public class HelpCommandExecutor implements CommandExecutor {
 
         // check permission
         if (!sender.hasPermission(Permission.ALLPAGES.toString()) && !sender.hasPermission(perm)) {
-            // send configured error message
             String msg = config.getMessageNoPagePermission();
             msg = convertColors(msg);
             msg = msg.replace("%page%", userFriendlyName);
             sender.sendMessage(msg);
             return;
         }
-
-        List<String> lines = config.getPage(name);
 
         // send configured title
         String title = config.getMessagePageTile();
@@ -161,7 +124,7 @@ public class HelpCommandExecutor implements CommandExecutor {
         sender.sendMessage(title);
 
         // send lines of page
-        for (String line : lines) {
+        for (String line : pages.getPage(name)) {
             line = convertColors(line);
             line = line.replace("%page%", userFriendlyName);
             sender.sendMessage(line);
@@ -170,80 +133,68 @@ public class HelpCommandExecutor implements CommandExecutor {
 
     /**
      * The list command. Send a list of names of all pages that the command sender has permission for.
-     * 
+     *
      * @param sender
      *            The command sender
      * @param args
      *            The command arguments
      */
     public void list(CommandSender sender, String[] args) {
-
         if (!sender.hasPermission(Permission.LIST.toString())) {
             sender.sendMessage(ChatColor.RED + "You don't have permission for the list command.");
             return;
         }
-
-        int pageNumber;
-        try {
-            pageNumber = Integer.parseInt(args[0]);
-        } catch (NullPointerException e) {
-            // args is null
-            pageNumber = 1;
-        } catch (IndexOutOfBoundsException e) {
-            // args is empty
-            pageNumber = 1;
-        } catch (NumberFormatException e) {
-            // args[0] is not a number
-            sender.sendMessage(ChatColor.RED + "Expected a page number.");
-            return;
+        int pageNumber = 1;
+        if (args.length > 0) {
+            try {
+                pageNumber = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "Expected a page number.");
+                return;
+            }
         }
-
         if (sender.hasPermission(Permission.ALLPAGES.toString())) {
             // sender has permission for all pages
 
             // send list of pages
-            sendPageList(sender, pageNumber, config.getPageNames());
-        } else {
-            // sender has permission for some pages
-
-            // only show the pages he has permission for
-            Set<String> original = config.getPageNames();
-            HashSet<String> pagesWithPermission = new HashSet<String>();
-            for (String pageName : original) {
-                String perm = Permission.convertPageNameToPermission(pageName);
-                if (sender.hasPermission(perm)) {
-                    pagesWithPermission.add(pageName);
-                }
-            }
-
-            // send list of pages
-            sendPageList(sender, pageNumber, pagesWithPermission);
+            sendPageList(sender, pageNumber, pages.getPageNames());
+            return;
         }
+        // sender has permission for some pages
+
+        // only show the pages he has permission for
+        Set<String> original = pages.getPageNames();
+        HashSet<String> pagesWithPermission = new HashSet<String>();
+        for (String pageName : original) {
+            String perm = Permission.convertPageNameToPermission(pageName);
+            if (sender.hasPermission(perm)) {
+                pagesWithPermission.add(pageName);
+            }
+        }
+
+        // send list of pages
+        sendPageList(sender, pageNumber, pagesWithPermission);
     }
 
     /**
      * The reload command. Reload the configuration files.
-     * 
+     *
      * @param sender
      *            The command sender.
-     * @param args
-     *            The command arguments.
      */
-    public void reload(CommandSender sender, String[] args) {
-
+    public void reload(CommandSender sender) {
         if (!sender.hasPermission(Permission.RELOAD.toString())) {
             sender.sendMessage(ChatColor.RED + "You don't have permission to reload the configuration.");
             return;
         }
-
         config.reload();
-        sender.sendMessage(ChatColor.GREEN + "Configuration reloaded.");
-
+        pages.reload();
+        sender.sendMessage(ChatColor.GREEN + "Configuration and Pages reloaded.");
     }
 
     /**
      * Used by list command. Send a list of page names to the command sender.
-     * 
+     *
      * @param sender
      *            The command sender
      * @param page
@@ -254,7 +205,7 @@ public class HelpCommandExecutor implements CommandExecutor {
     private static void sendPageList(CommandSender sender, int page, Set<String> names) {
         int total = names.size();
         int totalPerPage = 10;
-        int totalPages = total / totalPerPage + 1;
+        int totalPages = Math.max(1, (total + totalPerPage - 1) / totalPerPage);
         int startIndex = (page - 1) * totalPerPage;
         int endIndex = startIndex + totalPerPage;
 
@@ -267,7 +218,7 @@ public class HelpCommandExecutor implements CommandExecutor {
             sender.sendMessage(ChatColor.DARK_GRAY + " " + i + ". " + ChatColor.WHITE + userFriendly);
         }
         String nextPage;
-        if (page == totalPages) {
+        if (page >= totalPages) {
             nextPage = "1";
         } else {
             nextPage = String.valueOf(page + 1);
@@ -277,16 +228,15 @@ public class HelpCommandExecutor implements CommandExecutor {
 
     /**
      * Replace variable names for colors, to actual color values in a string.
-     * 
+     *
      * @param source
      *            The string with color variable names
      * @return The colored string
      */
     private static String convertColors(String source) {
         String result = source;
-        ChatColor[] values = ChatColor.values();
         // iterate over chat colors
-        for (ChatColor color : values) {
+        for (ChatColor color : ChatColor.values()) {
             // get normal name of color
             String name = color.name().replace("_", "").toLowerCase();
             // replace variable name with real color
@@ -297,27 +247,16 @@ public class HelpCommandExecutor implements CommandExecutor {
 
     /**
      * Used to convert a list of strings to a page name.
-     * 
+     *
      * @param args
      *            The arguments passed in a command
      * @return The page name
      */
     private static String convertArgsToPageName(String[] args) {
-        // put a dash(-) inbetween the arguments
-        String result = "";
-        if (args != null) {
-            for (String arg : args) {
-                result += arg + "-";
-            }
+        StringBuilder result = new StringBuilder("help");
+        for (String arg : args) {
+            result.append("-").append(arg);
         }
-
-        if (!result.isEmpty()) {
-            // remove that last dash
-            result = result.substring(0, result.length() - 1);
-
-            return "help-" + result;
-        } else {
-            return "help";
-        }
+        return result.toString();
     }
 }

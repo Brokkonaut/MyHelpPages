@@ -1,16 +1,15 @@
 package com.mtihc.minecraft.myhelppages;
 
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MyHelpPages extends JavaPlugin {
-
     private HelpConfiguration config;
+    private HelpPagesConfiguration pages;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.bukkit.plugin.java.JavaPlugin#onEnable()
      */
     @Override
@@ -18,16 +17,16 @@ public class MyHelpPages extends JavaPlugin {
 
         // config.yml
         config = new HelpConfiguration(this);
+        // pages.yml
+        pages = new HelpPagesConfiguration(this);
 
         // command
-        CommandExecutor executor = new HelpCommandExecutor(config);
-        getCommand("help").setExecutor(executor);
-
+        getCommand("help").setExecutor(new HelpCommandExecutor(config, pages));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.bukkit.plugin.java.JavaPlugin#getConfig()
      */
     @Override
@@ -37,7 +36,7 @@ public class MyHelpPages extends JavaPlugin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.bukkit.plugin.java.JavaPlugin#reloadConfig()
      */
     @Override
@@ -47,12 +46,11 @@ public class MyHelpPages extends JavaPlugin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.bukkit.plugin.java.JavaPlugin#saveConfig()
      */
     @Override
     public void saveConfig() {
         config.save();
     }
-
 }

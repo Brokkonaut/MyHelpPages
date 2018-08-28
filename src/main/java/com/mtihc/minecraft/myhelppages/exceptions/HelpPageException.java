@@ -4,7 +4,7 @@ package com.mtihc.minecraft.myhelppages.exceptions;
  * This class represents an exception that is usually thrown when
  * when a page is requested, but it doesn't exist.
  * Or when a page is added and it already exists.
- * 
+ *
  * @author Mitch
  *
  */
@@ -14,7 +14,7 @@ public class HelpPageException extends Exception {
 
     /**
      * The type of exception
-     * 
+     *
      * @author Mitch
      *
      */

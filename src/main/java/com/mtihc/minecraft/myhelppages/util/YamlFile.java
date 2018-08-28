@@ -13,21 +13,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 /**
  * This class represents a .yml file.
  * It uses the <code>YamlConfiguration</code> class to load/save/edit the file.
- * 
+ *
  * @author Mitch
  *
  */
 public class YamlFile {
-
     protected final JavaPlugin plugin;
     protected final String name;
     protected final File file;
-
     private YamlConfiguration config = null;
 
     /**
      * Constructor
-     * 
+     *
      * @param plugin
      *            The plugin
      * @param name
@@ -42,14 +40,12 @@ public class YamlFile {
         }
         this.plugin = plugin;
         this.name = name;
-
-        File dataFolder = plugin.getDataFolder();
-        file = new File(dataFolder, this.name + ".yml");
+        this.file = new File(plugin.getDataFolder(), name + ".yml");
     }
 
     /**
      * Returns the name of the file
-     * 
+     *
      * @return The name of the file
      */
     public String getName() {
@@ -58,7 +54,7 @@ public class YamlFile {
 
     /**
      * Returns the currently loaded configuration
-     * 
+     *
      * @return currently loaded config
      */
     public YamlConfiguration getConfig() {
@@ -71,7 +67,6 @@ public class YamlFile {
     public void reload() {
         try {
             config = YamlConfiguration.loadConfiguration(file);
-            setDefaults(this.name);
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, plugin.getDescription().getFullName() + " could not load file: " + file + " ", e);
         }
@@ -80,12 +75,11 @@ public class YamlFile {
     /**
      * Set default values from the plugin's resources.
      * Specify a fileName without extension.
-     * 
+     *
      * @param fileName
      *            The name of the file with default values
      */
     public void setDefaults(String fileName) {
-
         InputStream defConfigStream = plugin.getResource(fileName + ".yml");
         if (defConfigStream != null) {
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charset.forName("UTF-8")));
@@ -98,12 +92,11 @@ public class YamlFile {
     /**
      * Add default values from the plugin's resources.
      * Specify a fileName without extension.
-     * 
+     *
      * @param fileName
      *            The name of the file with default values
      */
     public void addDefaults(String fileName) {
-
         InputStream defConfigStream = plugin.getResource(fileName + ".yml");
         if (defConfigStream != null) {
             YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charset.forName("UTF-8")));
