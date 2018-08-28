@@ -4,6 +4,8 @@ package com.mtihc.minecraft.myhelppages.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -81,7 +83,7 @@ public class YamlFile {
 		InputStream defConfigStream = plugin.getResource(fileName + ".yml");
 		if (defConfigStream != null) {
 			YamlConfiguration defConfig = YamlConfiguration
-				.loadConfiguration(defConfigStream);
+				.loadConfiguration(new InputStreamReader(defConfigStream, Charset.forName("UTF-8")));
 			config.options().copyDefaults(true);
 			config.setDefaults(defConfig);
 			save();
@@ -99,7 +101,7 @@ public class YamlFile {
 		InputStream defConfigStream = plugin.getResource(fileName + ".yml");
 		if (defConfigStream != null) {
 			YamlConfiguration defConfig = YamlConfiguration
-				.loadConfiguration(defConfigStream);
+			        .loadConfiguration(new InputStreamReader(defConfigStream, Charset.forName("UTF-8")));
 			config.options().copyDefaults(true);
 			config.addDefaults(defConfig);
 			save();

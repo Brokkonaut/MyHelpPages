@@ -5,6 +5,7 @@ main: com.mtihc.minecraft.myhelppages.MyHelpPages
 depend: []
 softdepend: []
 version: 1.4.1
+api-version: 1.13
 commands:
     help:
         description: Shows a help page. The page can be a name or number.
