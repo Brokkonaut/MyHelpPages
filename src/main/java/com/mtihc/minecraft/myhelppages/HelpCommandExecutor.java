@@ -3,7 +3,6 @@ package com.mtihc.minecraft.myhelppages;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -164,7 +163,7 @@ public class HelpCommandExecutor implements CommandExecutor {
 
         // only show the pages he has permission for
         Set<String> original = pages.getPageNames();
-        HashSet<String> pagesWithPermission = new HashSet<String>();
+        HashSet<String> pagesWithPermission = new HashSet<>();
         for (String pageName : original) {
             String perm = Permission.convertPageNameToPermission(pageName);
             if (sender.hasPermission(perm)) {

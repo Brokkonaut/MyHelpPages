@@ -1,10 +1,9 @@
 package com.mtihc.minecraft.myhelppages;
 
+import com.mtihc.minecraft.myhelppages.util.YamlFile;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.mtihc.minecraft.myhelppages.util.YamlFile;
 
 /**
  * Implementation of the <code>IHelpConfiguration</code> interface.

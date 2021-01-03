@@ -7,7 +7,10 @@ package com.mtihc.minecraft.myhelppages;
  *
  */
 public enum Permission {
-    RELOAD("myhelppages.reload"), LIST("myhelppages.list"), MAIN("myhelppages"), ALLPAGES("myhelppages.allpages");
+    RELOAD("myhelppages.reload"),
+    LIST("myhelppages.list"),
+    MAIN("myhelppages"),
+    ALLPAGES("myhelppages.allpages");
 
     private String node;
 

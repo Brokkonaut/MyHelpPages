@@ -1,15 +1,13 @@
 package com.mtihc.minecraft.myhelppages;
 
+import com.mtihc.minecraft.myhelppages.exceptions.HelpPageException;
+import com.mtihc.minecraft.myhelppages.util.YamlFile;
 import java.util.List;
 import java.util.Set;
-
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.mtihc.minecraft.myhelppages.exceptions.HelpPageException;
-import com.mtihc.minecraft.myhelppages.util.YamlFile;
 
 public class HelpPagesConfiguration extends YamlFile implements IHelpPagesConfiguration {
     public HelpPagesConfiguration(JavaPlugin plugin) {

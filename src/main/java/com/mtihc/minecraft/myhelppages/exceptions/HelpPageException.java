@@ -19,7 +19,8 @@ public class HelpPageException extends Exception {
      *
      */
     public enum Type {
-        PAGE_NOT_EXIST("That page does not exist."), PAGE_ALREADY_EXIST("That page already exists.");
+        PAGE_NOT_EXIST("That page does not exist."),
+        PAGE_ALREADY_EXIST("That page already exists.");
 
         private String message;
 
