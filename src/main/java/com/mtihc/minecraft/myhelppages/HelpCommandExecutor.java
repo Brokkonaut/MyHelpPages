@@ -1,8 +1,12 @@
 package com.mtihc.minecraft.myhelppages;
 
+import de.iani.cubesideutils.ComponentUtil;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -98,9 +102,8 @@ public class HelpCommandExecutor implements CommandExecutor {
         // check existance
         if (!pages.hasPage(name)) {
             String msg = config.getMessagePageNotFound();
-            msg = convertColors(msg);
             msg = msg.replace("%page%", userFriendlyName);
-            sender.sendMessage(msg);
+            sender.sendMessage(convertColors(msg));
             return;
         }
 
@@ -110,23 +113,20 @@ public class HelpCommandExecutor implements CommandExecutor {
         // check permission
         if (!sender.hasPermission(Permission.ALLPAGES.toString()) && !sender.hasPermission(perm)) {
             String msg = config.getMessageNoPagePermission();
-            msg = convertColors(msg);
             msg = msg.replace("%page%", userFriendlyName);
-            sender.sendMessage(msg);
+            sender.sendMessage(convertColors(msg));
             return;
         }
 
         // send configured title
         String title = config.getMessagePageTile();
-        title = convertColors(title);
         title = title.replace("%page%", userFriendlyName);
-        sender.sendMessage(title);
+        sender.sendMessage(convertColors(title));
 
         // send lines of page
         for (String line : pages.getPage(name)) {
-            line = convertColors(line);
             line = line.replace("%page%", userFriendlyName);
-            sender.sendMessage(line);
+            sender.sendMessage(convertColors(line));
         }
     }
 
@@ -232,16 +232,20 @@ public class HelpCommandExecutor implements CommandExecutor {
      *            The string with color variable names
      * @return The colored string
      */
-    private static String convertColors(String source) {
+    private static BaseComponent convertColors(String source) {
         String result = source;
         // iterate over chat colors
         for (ChatColor color : ChatColor.values()) {
             // get normal name of color
             String name = color.name().replace("_", "").toLowerCase();
             // replace variable name with real color
-            result = result.replace("%" + name + "%", color.toString());
+            result = result.replace("%" + name + "%", "&" + color.getChar());
         }
-        return result;
+        try {
+            return ComponentUtil.convertEscaped(result);
+        } catch (ParseException e) {
+            return new TextComponent("Could not parse string line: " + source);
+        }
     }
 
     /**
