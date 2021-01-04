@@ -2,8 +2,10 @@ package com.mtihc.minecraft.myhelppages;
 
 import com.mtihc.minecraft.myhelppages.exceptions.HelpPageException;
 import com.mtihc.minecraft.myhelppages.util.YamlFile;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -41,6 +43,18 @@ public class HelpPagesConfiguration extends YamlFile implements IHelpPagesConfig
     @Override
     public List<String> getPage(String name) {
         return this.pages().getStringList(name);
+    }
+
+    @Override
+    public Collection<String> getPagesStartingWith(String name) {
+        TreeSet<String> result = new TreeSet<>();
+        ConfigurationSection pages = this.pages();
+        for (String key : pages.getKeys(false)) {
+            if (key.startsWith(name) && pages.isList(key)) {
+                result.add(key);
+            }
+        }
+        return result;
     }
 
     public void addPage(String name, List<String> lines) throws HelpPageException {

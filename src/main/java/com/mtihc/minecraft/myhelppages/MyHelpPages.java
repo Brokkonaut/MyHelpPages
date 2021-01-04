@@ -22,6 +22,7 @@ public class MyHelpPages extends JavaPlugin {
 
         // command
         getCommand("help").setExecutor(new HelpCommandExecutor(config, pages));
+        getCommand("help").setTabCompleter(new HelpCommandTabCompleter(config, pages));
     }
 
     /*

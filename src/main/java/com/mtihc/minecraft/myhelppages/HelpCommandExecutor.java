@@ -251,7 +251,7 @@ public class HelpCommandExecutor implements CommandExecutor {
      *            The arguments passed in a command
      * @return The page name
      */
-    private static String convertArgsToPageName(String[] args) {
+    protected static String convertArgsToPageName(String[] args) {
         StringBuilder result = new StringBuilder("help");
         for (String arg : args) {
             result.append("-").append(arg);
