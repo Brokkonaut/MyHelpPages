@@ -15,6 +15,10 @@ public class HelpConfiguration extends YamlFile implements IHelpConfiguration {
     public HelpConfiguration(JavaPlugin plugin) {
         super(plugin, "config");
         reload();
+        if (getConfig().contains("pages")) {
+            getConfig().set("pages", null);
+            save();
+        }
         if (getConfig().contains("messages")) {
             return;
         }
