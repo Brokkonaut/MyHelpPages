@@ -10,10 +10,8 @@ import org.bukkit.command.TabCompleter;
 
 public class HelpCommandTabCompleter implements TabCompleter {
     private IHelpPagesConfiguration pages;
-    private IHelpConfiguration config;
 
     public HelpCommandTabCompleter(IHelpConfiguration config, IHelpPagesConfiguration pages) {
-        this.config = config;
         this.pages = pages;
     }
 
@@ -43,7 +41,7 @@ public class HelpCommandTabCompleter implements TabCompleter {
             if (sender.hasPermission(Permission.ALLPAGES.toString()) || sender.hasPermission(perm)) {
                 String userFriendlyName = name.replace("-", " ");
                 String[] nameParts = userFriendlyName.split(" ");
-                if (nameParts.length >= args.length + 1) {
+                if (nameParts.length >= args.length + 1) { // first part is always "help"
                     completions.add(nameParts[args.length]);
                 }
             }
