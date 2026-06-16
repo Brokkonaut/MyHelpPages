@@ -1,12 +1,11 @@
 package com.mtihc.minecraft.myhelppages;
 
-import de.iani.cubesideutils.ComponentUtil;
-import java.text.ParseException;
+import de.iani.cubesideutils.CubesideComponentSerializer;
+import de.iani.cubesideutils.NamedChatColor;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -232,20 +231,16 @@ public class HelpCommandExecutor implements CommandExecutor {
      *            The string with color variable names
      * @return The colored string
      */
-    private static BaseComponent convertColors(String source) {
+    private static Component convertColors(String source) {
         String result = source;
         // iterate over chat colors
-        for (ChatColor color : ChatColor.values()) {
+        for (NamedChatColor color : NamedChatColor.values()) {
             // get normal name of color
             String name = color.name().replace("_", "").toLowerCase();
             // replace variable name with real color
             result = result.replace("%" + name + "%", "&" + color.getChar());
         }
-        try {
-            return ComponentUtil.convertEscaped(result);
-        } catch (ParseException e) {
-            return new TextComponent("Could not parse string line: " + source);
-        }
+        return CubesideComponentSerializer.instance(true, true).deserialize(result);
     }
 
     /**

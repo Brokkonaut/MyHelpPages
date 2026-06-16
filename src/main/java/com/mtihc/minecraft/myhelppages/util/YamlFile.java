@@ -67,7 +67,7 @@ public class YamlFile {
         try {
             config = YamlConfiguration.loadConfiguration(file);
         } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, plugin.getDescription().getFullName() + " could not load file: " + file + " ", e);
+            plugin.getLogger().log(Level.WARNING, "Could not load file: " + file + " ", e);
         }
     }
 
@@ -112,7 +112,7 @@ public class YamlFile {
         try {
             config.save(file);
         } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, plugin.getDescription().getFullName() + " could not save to file: " + file + " ", e);
+            plugin.getLogger().log(Level.SEVERE, "Could not save to file: " + file + " ", e);
         }
     }
 
