@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -75,11 +75,11 @@ public class HelpCommandExecutor implements CommandExecutor {
      *            The command sender
      */
     public void commandHelp(CommandSender sender) {
-        sender.sendMessage(ChatColor.GREEN + "Command list:");
-        sender.sendMessage(ChatColor.WHITE + "/help" + ChatColor.DARK_GREEN + " See the main help page.");
-        sender.sendMessage(ChatColor.WHITE + "/help [page name]" + ChatColor.DARK_GREEN + " See a help page.");
-        sender.sendMessage(ChatColor.WHITE + "/help -list [number]" + ChatColor.DARK_GREEN + " List all help pages.");
-        sender.sendMessage(ChatColor.WHITE + "/help -reload" + ChatColor.DARK_GREEN + " Reload the configuration and pages.");
+        sender.sendMessage(Component.text("Command list:", NamedTextColor.GREEN));
+        sendCommandHelpLine(sender, "/help", " See the main help page.");
+        sendCommandHelpLine(sender, "/help [page name]", " See a help page.");
+        sendCommandHelpLine(sender, "/help -list [number]", " List all help pages.");
+        sendCommandHelpLine(sender, "/help -reload", " Reload the configuration and pages.");
     }
 
     /**
@@ -139,7 +139,7 @@ public class HelpCommandExecutor implements CommandExecutor {
      */
     public void list(CommandSender sender, String[] args) {
         if (!sender.hasPermission(Permission.LIST.toString())) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission for the list command.");
+            sender.sendMessage(Component.text("You don't have permission for the list command.", NamedTextColor.RED));
             return;
         }
         int pageNumber = 1;
@@ -147,7 +147,7 @@ public class HelpCommandExecutor implements CommandExecutor {
             try {
                 pageNumber = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Expected a page number.");
+                sender.sendMessage(Component.text("Expected a page number.", NamedTextColor.RED));
                 return;
             }
         }
@@ -182,12 +182,12 @@ public class HelpCommandExecutor implements CommandExecutor {
      */
     public void reload(CommandSender sender) {
         if (!sender.hasPermission(Permission.RELOAD.toString())) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to reload the configuration.");
+            sender.sendMessage(Component.text("You don't have permission to reload the configuration.", NamedTextColor.RED));
             return;
         }
         config.reload();
         pages.reload();
-        sender.sendMessage(ChatColor.GREEN + "Configuration and Pages reloaded.");
+        sender.sendMessage(Component.text("Configuration and Pages reloaded.", NamedTextColor.GREEN));
     }
 
     /**
@@ -207,13 +207,16 @@ public class HelpCommandExecutor implements CommandExecutor {
         int startIndex = (page - 1) * totalPerPage;
         int endIndex = startIndex + totalPerPage;
 
-        sender.sendMessage(ChatColor.GREEN + "List of all help pages " + ChatColor.WHITE + "(" + page + "/" + totalPages + ")" + ChatColor.GREEN + ":");
+        sender.sendMessage(Component.text("List of all help pages ", NamedTextColor.GREEN)
+                .append(Component.text("(" + page + "/" + totalPages + ")", NamedTextColor.WHITE))
+                .append(Component.text(":")));
 
         String[] nameArray = names.toArray(new String[names.size()]);
 
         for (int i = startIndex; i < endIndex && i < total; i++) {
             String userFriendly = "/" + nameArray[i].replace("-", " ");
-            sender.sendMessage(ChatColor.DARK_GRAY + " " + i + ". " + ChatColor.WHITE + userFriendly);
+            sender.sendMessage(Component.text(" " + i + ". ", NamedTextColor.DARK_GRAY)
+                    .append(Component.text(userFriendly, NamedTextColor.WHITE)));
         }
         String nextPage;
         if (page >= totalPages) {
@@ -221,7 +224,13 @@ public class HelpCommandExecutor implements CommandExecutor {
         } else {
             nextPage = String.valueOf(page + 1);
         }
-        sender.sendMessage(ChatColor.GREEN + "Next page: " + ChatColor.WHITE + "/help -list " + nextPage);
+        sender.sendMessage(Component.text("Next page: ", NamedTextColor.GREEN)
+                .append(Component.text("/help -list " + nextPage, NamedTextColor.WHITE)));
+    }
+
+    private static void sendCommandHelpLine(CommandSender sender, String command, String description) {
+        sender.sendMessage(Component.text(command, NamedTextColor.WHITE)
+                .append(Component.text(description, NamedTextColor.DARK_GREEN)));
     }
 
     /**
