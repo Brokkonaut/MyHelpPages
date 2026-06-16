@@ -1,7 +1,8 @@
 package com.mtihc.minecraft.myhelppages;
 
-import de.iani.cubesideutils.CubesideComponentSerializer;
+import de.iani.cubesideutils.ComponentUtilAdventure;
 import de.iani.cubesideutils.NamedChatColor;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -249,7 +250,11 @@ public class HelpCommandExecutor implements CommandExecutor {
             // replace variable name with real color
             result = result.replace("%" + name + "%", "&" + color.getChar());
         }
-        return CubesideComponentSerializer.instance(true, true).deserialize(result);
+        try {
+            return ComponentUtilAdventure.convertEscaped(result);
+        } catch (ParseException e) {
+            return Component.text("Could not parse string line: " + source);
+        }
     }
 
     /**
